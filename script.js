@@ -355,7 +355,7 @@ function toggleSearchBar() {
 }
 
 // Dans document.addEventListener('DOMContentLoaded', ...) ajoute après initSearch():
-const searchBarVisible = localStorage.getItem('searchBarVisible') !== 'false';
+const searchBarVisible = localStorage.getItem('searchBarVisible') !== 'true';
 if (!searchBarVisible) {
   document.getElementById('searchBar').classList.add('hidden');
   document.getElementById('searchToggle').classList.remove('active');
