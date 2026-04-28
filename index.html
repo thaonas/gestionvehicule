@@ -43,7 +43,7 @@
         <option value="engine">Moteur</option>
         <option value="year">Année</option>
       </select>
-      <button onclick="clearSearch()" class="btn btn-close" style="width:38px; height:38px; min-width:0; padding:0; display:flex; align-items:center; justify-content:center;">✖️</button>
+      <button onclick="clearSearch()" class="btn btn-close" style="width:38px; height:38px; min-width:0; padding:0; display:flex; align-items:center; justify-content:center;" title="Effacer">✖️</button>
     </div>
 
     <ul id="ownerList" class="owner-list"></ul>
@@ -53,7 +53,7 @@
   <!-- MODALS -->
   <div id="mainModal" class="modal">
     <div class="modal-content">
-      <div class="modal-header"><h2 id="mainTitle">Titre</h2><button class="close-btn" onclick="closeModal('mainModal')">&times;</button></div>
+      <div class="modal-header"><h2 id="mainTitle">Titre</h2><button class="close-btn" onclick="closeModal('mainModal')" title="Fermer">&times;</button></div>
       <div class="modal-body" id="mainBody"></div>
       <div class="modal-footer" id="mainFooter"></div>
     </div>
@@ -61,7 +61,7 @@
 
   <div id="tireModal" class="modal" style="z-index:1050">
     <div class="modal-content">
-      <div class="modal-header"><h2>🛞 Pneumatiques</h2><button class="close-btn" onclick="closeModal('tireModal')">&times;</button></div>
+      <div class="modal-header"><h2>🛞 Pneumatiques</h2><button class="close-btn" onclick="closeModal('tireModal')" title="Fermer">&times;</button></div>
       <div class="modal-body" id="tireBody"></div>
       <div class="modal-footer" id="tireFooter"></div>
     </div>
@@ -69,7 +69,7 @@
 
   <div id="fluidModal" class="modal" style="z-index:1050">
     <div class="modal-content">
-      <div class="modal-header"><h2>💧 Liquides & Huiles</h2><button class="close-btn" onclick="closeModal('fluidModal')">&times;</button></div>
+      <div class="modal-header"><h2>💧 Liquides & Huiles</h2><button class="close-btn" onclick="closeModal('fluidModal')" title="Fermer">&times;</button></div>
       <div class="modal-body" id="fluidBody"></div>
       <div class="modal-footer" id="fluidFooter"></div>
     </div>
@@ -77,7 +77,7 @@
 
   <div id="maintenanceModal" class="modal" style="z-index:1050">
     <div class="modal-content">
-      <div class="modal-header"><h2>🔧 Entretien & Révisions</h2><button class="close-btn" onclick="closeModal('maintenanceModal')">&times;</button></div>
+      <div class="modal-header"><h2>🔧 Entretien & Révisions</h2><button class="close-btn" onclick="closeModal('maintenanceModal')" title="Fermer">&times;</button></div>
       <div class="modal-body" id="maintenanceBody"></div>
       <div class="modal-footer" id="maintenanceFooter"></div>
     </div>
@@ -85,7 +85,7 @@
 
   <div id="passwordModal" class="modal" style="z-index:1060">
     <div class="modal-content">
-      <div class="modal-header"><h2 id="pwdTitle">🔐 Définir un mot de passe</h2><button class="close-btn" onclick="closeModal('passwordModal')">&times;</button></div>
+      <div class="modal-header"><h2 id="pwdTitle">🔐 Définir un mot de passe</h2><button class="close-btn" onclick="closeModal('passwordModal')" title="Fermer">&times;</button></div>
       <div class="modal-body">
         <div id="pwdCurrentGroup" class="form-group"><label class="form-label">Mot de passe actuel</label><input type="password" id="pwdCurrent"></div>
         <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input type="password" id="pwdNew"></div>
@@ -93,8 +93,8 @@
         <p id="pwdNotice" style="font-size:0.85rem; color:var(--muted); margin-top:0.5rem;">⚠️ Ce mot de passe protégera l'accès à votre base de données.</p>
       </div>
       <div class="modal-footer">
-        <button id="pwdSubmitBtn" onclick="savePassword()" class="btn btn-validate">💾 Définir</button>
-        <button onclick="closeModal('passwordModal')" class="btn btn-close">Annuler</button>
+        <button id="pwdSubmitBtn" onclick="savePassword()" class="btn btn-validate" title="Définir">💾 Définir</button>
+        <button onclick="closeModal('passwordModal')" class="btn btn-close" title="Annuler">Annuler</button>
       </div>
     </div>
   </div>
@@ -104,7 +104,7 @@
       <div class="modal-header"><h2>ℹ️ À propos</h2><button class="close-btn" onclick="closeModal('aboutModal')">&times;</button></div>
       <div class="modal-body" style="text-align:center; line-height:1.8;">
         <h3 style="margin:0.5rem 0;">🚗 Gestion de Véhicules</h3>
-        <p>Version 1.1.0 • Projet personnel</p>
+        <p>Version 1.0.0 • Projet personnel</p>
         <hr style="border:0; border-top:1px dashed var(--border); margin:1rem 0;">
         <p><strong>Conception & Développement :</strong><br>Thao</p>
         <p><strong>Architecture & Assistance technique :</strong><br>Qwen (IA)</p>
@@ -114,7 +114,7 @@
           © 2026 - Tous droits réservés.
         </p>
       </div>
-      <div class="modal-footer"><button onclick="closeModal('aboutModal')" class="btn btn-close">Fermer</button></div>
+      <div class="modal-footer"><button onclick="closeModal('aboutModal')" class="btn btn-close" title="Fermer">Fermer</button></div>
     </div>
   </div>
 
@@ -124,7 +124,7 @@
       <p>Entrez votre mot de passe pour accéder à la liste.</p>
       <input type="password" id="lockInput" placeholder="Mot de passe..." autocomplete="off">
       <div class="lock-actions">
-        <button onclick="unlockApp()" class="btn btn-validate">Déverrouiller</button>
+        <button onclick="unlockApp()" class="btn btn-validate" title="Déverrouiller">Déverrouiller</button>
       </div>
       <p id="lockError" style="color:var(--danger); margin-top:0.5rem; display:none;">Mot de passe incorrect</p>
     </div>
