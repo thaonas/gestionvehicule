@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚗 Gestion de Véhicules</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="top-header">
+    <h1 style="margin:0; text-align:left;">🚗 Gestion de Véhicules</h1>
+    <div class="theme-row">
+      <div class="theme-control">
+        <span class="theme-label">🌙 Mode sombre</span>
+        <label class="theme-switch" title="Basculer mode sombre">
+          <input type="checkbox" id="themeToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="header-row">
+      <h2 style="margin:0">📋 Liste des véhicules <span id="countDisplay" style="font-weight:400; color:var(--muted); font-size:0.9em;">(0)</span></h2>
+      <div class="header-actions">
+        <button class="btn btn-add" onclick="openAddModal()">➕ Ajouter</button>
+		<button id="searchToggle" class="btn btn-sub" onclick="toggleSearchBar()" title="Rechercher">🔍</button>
+        <button id="lockBtn" class="btn btn-sub" onclick="handleLockClick()" title="Sécuriser">🔓</button>
+        <button id="aboutBtn" class="btn btn-edit" onclick="openAboutModal()" title="À propos">ℹ️</button>
+        <button onclick="exportDB()" class="btn btn-sub">📤 Exporter</button>
+        <button onclick="document.getElementById('importFile').click()" class="btn btn-edit">📥 Importer</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importDB(this)">
+      </div>
+    </div>
+    
+    <div class="search-bar" id="searchBar">
+      <input type="text" id="searchInput" placeholder="Rechercher...">
+      <select id="searchField">
+        <option value="owner">Propriétaire</option>
+        <option value="brand">Marque</option>
+        <option value="model">Modèle</option>
+        <option value="engine">Moteur</option>
+        <option value="year">Année</option>
+      </select>
+      <button onclick="clearSearch()" class="btn btn-close" style="width:38px; height:38px; min-width:0; padding:0; display:flex; align-items:center; justify-content:center;">✖️</button>
+    </div>
+
+    <ul id="ownerList" class="owner-list"></ul>
+    <p id="emptyMsg" class="empty-msg">Aucun véhicule enregistré.</p>
+  </div>
+
+  <!-- MODALS -->
+  <div id="mainModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header"><h2 id="mainTitle">Titre</h2><button class="close-btn" onclick="closeModal('mainModal')">&times;</button></div>
+      <div class="modal-body" id="mainBody"></div>
+      <div class="modal-footer" id="mainFooter"></div>
+    </div>
+  </div>
+
+  <div id="tireModal" class="modal" style="z-index:1050">
+    <div class="modal-content">
+      <div class="modal-header"><h2>🛞 Pneumatiques</h2><button class="close-btn" onclick="closeModal('tireModal')">&times;</button></div>
+      <div class="modal-body" id="tireBody"></div>
+      <div class="modal-footer" id="tireFooter"></div>
+    </div>
+  </div>
+
+  <div id="fluidModal" class="modal" style="z-index:1050">
+    <div class="modal-content">
+      <div class="modal-header"><h2>💧 Liquides & Huiles</h2><button class="close-btn" onclick="closeModal('fluidModal')">&times;</button></div>
+      <div class="modal-body" id="fluidBody"></div>
+      <div class="modal-footer" id="fluidFooter"></div>
+    </div>
+  </div>
+
+  <div id="maintenanceModal" class="modal" style="z-index:1050">
+    <div class="modal-content">
+      <div class="modal-header"><h2>🔧 Entretien & Révisions</h2><button class="close-btn" onclick="closeModal('maintenanceModal')">&times;</button></div>
+      <div class="modal-body" id="maintenanceBody"></div>
+      <div class="modal-footer" id="maintenanceFooter"></div>
+    </div>
+  </div>
+
+  <div id="passwordModal" class="modal" style="z-index:1060">
+    <div class="modal-content">
+      <div class="modal-header"><h2 id="pwdTitle">🔐 Définir un mot de passe</h2><button class="close-btn" onclick="closeModal('passwordModal')">&times;</button></div>
+      <div class="modal-body">
+        <div id="pwdCurrentGroup" class="form-group"><label class="form-label">Mot de passe actuel</label><input type="password" id="pwdCurrent"></div>
+        <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input type="password" id="pwdNew"></div>
+        <div class="form-group"><label class="form-label">Confirmation</label><input type="password" id="pwdConfirm"></div>
+        <p id="pwdNotice" style="font-size:0.85rem; color:var(--muted); margin-top:0.5rem;">⚠️ Ce mot de passe protégera l'accès à votre base de données.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="pwdSubmitBtn" onclick="savePassword()" class="btn btn-validate">💾 Définir</button>
+        <button onclick="closeModal('passwordModal')" class="btn btn-close">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="aboutModal" class="modal" style="z-index:1060">
+    <div class="modal-content">
+      <div class="modal-header"><h2>ℹ️ À propos</h2><button class="close-btn" onclick="closeModal('aboutModal')">&times;</button></div>
+      <div class="modal-body" style="text-align:center; line-height:1.8;">
+        <h3 style="margin:0.5rem 0;">🚗 Gestion de Véhicules</h3>
+        <p>Version 1.0.0 • Projet personnel</p>
+        <hr style="border:0; border-top:1px dashed var(--border); margin:1rem 0;">
+        <p><strong>Conception & Développement :</strong><br>Thao</p>
+        <p><strong>Architecture & Assistance technique :</strong><br>Qwen (IA)</p>
+        <p style="font-size:0.85rem; color:var(--muted); margin-top:1rem;">
+          Application 100% hors ligne.<br>
+          Les logos sont des créations personnelles pour usage privé.<br>
+          © 2026 - Tous droits réservés.
+        </p>
+      </div>
+      <div class="modal-footer"><button onclick="closeModal('aboutModal')" class="btn btn-close">Fermer</button></div>
+    </div>
+  </div>
+
+  <div id="lockScreen" class="lock-screen" style="display:none;">
+    <div class="lock-box">
+      <h2>🔐 Base sécurisée</h2>
+      <p>Entrez votre mot de passe pour accéder à la liste.</p>
+      <input type="password" id="lockInput" placeholder="Mot de passe..." autocomplete="off">
+      <div class="lock-actions">
+        <button onclick="unlockApp()" class="btn btn-validate">Déverrouiller</button>
+      </div>
+      <p id="lockError" style="color:var(--danger); margin-top:0.5rem; display:none;">Mot de passe incorrect</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
