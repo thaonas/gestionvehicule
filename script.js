@@ -142,9 +142,9 @@ function renderMainModal(d) {
       <div class="detail-item"><div class="detail-label">📝 Ajouté le</div><div class="detail-value">${fmt(d.addedAt)}</div></div>
     </div>
     <div class="btn-sub-group">
-      <button class="btn btn-sub" onclick="openTireModal()">🛞 Voir pneumatiques</button>
-      <button class="btn btn-sub" onclick="openFluidModal()">💧 Voir liquides</button>
-      <button class="btn btn-sub" onclick="openMaintenanceModal()">🔧 Voir entretien</button>
+      <button class="btn btn-sub" onclick="openTireModal()" title="Pneumatiques">🛞 Pneumatiques</button>
+      <button class="btn btn-sub" onclick="openFluidModal()" title="Liquides">💧 Liquides</button>
+      <button class="btn btn-sub" onclick="openMaintenanceModal()" title="Entretien">🔧 Entretien</button>
     </div>`;
   } else {
     title.textContent = currentMode==='add' ? '➕ Nouveau véhicule' : '✏️ Modifier le véhicule';
@@ -161,9 +161,9 @@ function renderMainModal(d) {
       <div class="form-group"><label class="form-label">Énergie <span class="required">*</span></label><select id="m_energy"><option value="Essence" ${d.energy==='Essence'?'selected':''}>Essence</option><option value="Diesel" ${d.energy==='Diesel'?'selected':''}>Diesel</option><option value="Hybride" ${d.energy==='Hybride'?'selected':''}>Hybride</option><option value="Électrique" ${d.energy==='Électrique'?'selected':''}>Électrique</option><option value="GPL" ${d.energy==='GPL'?'selected':''}>GPL</option></select></div>
     </div>
     <div class="btn-sub-group">
-      <button class="btn btn-sub" onclick="openTireModal()">🛞 Gérer les pneumatiques</button>
-      <button class="btn btn-sub" onclick="openFluidModal()">💧 Gérer les liquides</button>
-      <button class="btn btn-sub" onclick="openMaintenanceModal()">🔧 Gérer l'entretien</button>
+      <button class="btn btn-sub" onclick="openTireModal()" title="Pneumatiques">🛞 Pneumatiques</button>
+      <button class="btn btn-sub" onclick="openFluidModal()" title="Liquides">💧 Liquides</button>
+      <button class="btn btn-sub" onclick="openMaintenanceModal()" title="Entretien">🔧 Entretien</button>
     </div>`;
   }
 }
@@ -174,15 +174,15 @@ function updateMainButtons() {
   if (currentMode === 'view') {
     // Mode lecture : Modifier + Fermer + SUPPRIMER
     footer.innerHTML = `
-      <button class="btn btn-edit" onclick="enableEditMode()">✏️ Modifier</button>
-      <button class="btn btn-cancel" onclick="deleteVehicle()" style="background:var(--danger);color:white">🗑️ Supprimer</button>
-      <button class="btn btn-close" onclick="closeModal('mainModal')">Fermer</button>
+      <button class="btn btn-edit" onclick="enableEditMode()" title="Modifier">✏️ Modifier</button>
+      <button class="btn btn-cancel" onclick="deleteVehicle()" style="background:var(--danger);color:white" title="Supprimer">🗑️ Supprimer</button>
+      <button class="btn btn-close" onclick="closeModal('mainModal')" title="Fermer">Fermer</button>
     `;
   } else {
     // Mode ajout/modif : Valider + Retour
     footer.innerHTML = `
-      <button class="btn btn-validate" onclick="validateMainForm()">✅ Valider</button>
-      <button class="btn btn-cancel" onclick="closeModal('mainModal')">Retour</button>
+      <button class="btn btn-validate" onclick="validateMainForm()" title="Valider">✅ Valider</button>
+      <button class="btn btn-cancel" onclick="closeModal('mainModal')" title="Retour">Retour</button>
     `;
   }
 }
@@ -221,10 +221,10 @@ function openTireModal() {
   const fields = [{id:'t_f_brand',v:t.front.brand,l:'🟦 Avant - Marque'},{id:'t_f_size',v:t.front.size,l:'🟦 Avant - Taille'},{id:'t_f_pres',v:t.front.pressure,l:'🟦 Avant - Pression',t:'number'},{id:'t_f_date',v:t.front.date,l:'🟦 Avant - Date',t:'month'},{id:'t_r_brand',v:t.rear.brand,l:'🟥 Arrière - Marque'},{id:'t_r_size',v:t.rear.size,l:'🟥 Arrière - Taille'},{id:'t_r_pres',v:t.rear.pressure,l:'🟥 Arrière - Pression',t:'number'},{id:'t_r_date',v:t.rear.date,l:'🟥 Arrière - Date',t:'month'}];
   if (ro) {
     document.getElementById('tireBody').innerHTML = `<div class="detail-grid">${fields.map(f=>`<div class="detail-item"><div class="detail-label">${f.l}</div><div class="detail-value">${fmt(f.v)}</div></div>`).join('')}<div class="detail-item"><div class="detail-label">📅 Dernier contrôle</div><div class="detail-value">${fmt(t.lastCheck)}</div></div></div>`;
-    document.getElementById('tireFooter').innerHTML = `<button class="btn btn-close" onclick="closeModal('tireModal')">Fermer</button>`;
+    document.getElementById('tireFooter').innerHTML = `<button class="btn btn-close" onclick="closeModal('tireModal')" title="Fermer">Fermer</button>`;
   } else {
     document.getElementById('tireBody').innerHTML = `<div class="form-grid">${fields.map(f=>`<div class="form-group"><label class="form-label">${f.l}</label><input id="${f.id}" value="${f.v}" ${f.t?`type="${f.t}" step="0.1"`:''}></div>`).join('')}</div><div class="form-group"><label class="form-label">📅 Dernier contrôle</label><input type="date" id="t_check" value="${t.lastCheck}"></div>`;
-    document.getElementById('tireFooter').innerHTML = `<button class="btn btn-validate" onclick="saveTires()">💾 Enregistrer</button><button class="btn btn-cancel" onclick="closeModal('tireModal')">Fermer</button>`;
+    document.getElementById('tireFooter').innerHTML = `<button class="btn btn-validate" onclick="saveTires()" title="Enregistrer">💾 Enregistrer</button><button class="btn btn-cancel" onclick="closeModal('tireModal')" title="Fermer">Fermer</button>`;
   }
   showModal('tireModal');
 }
@@ -273,7 +273,7 @@ function openFluidModal() {
       html += `</div></div>`;
     });
     document.getElementById('fluidBody').innerHTML = html;
-    document.getElementById('fluidFooter').innerHTML = `<button class="btn btn-validate" onclick="saveFluids()">💾 Enregistrer</button><button class="btn btn-cancel" onclick="closeModal('fluidModal')">Fermer</button>`;
+    document.getElementById('fluidFooter').innerHTML = `<button class="btn btn-validate" onclick="saveFluids()" title="Enregistrer">💾 Enregistrer</button><button class="btn btn-cancel" onclick="closeModal('fluidModal')" title="Fermer">Fermer</button>`;
   }
   showModal('fluidModal');
 }
@@ -294,10 +294,10 @@ function openMaintenanceModal() {
   const items = [{k:'timingBelt',l:'🔗 Kit Distribution'},{k:'oilChange',l:'🛢️ Vidange'},{k:'brakeFluid',l:'🛑 Liquide Frein'},{k:'tiresRotation',l:'🔄 Rotation Pneus'},{k:'generalCheck',l:'🔍 Contrôle Général'}];
   if (ro) {
     document.getElementById('maintenanceBody').innerHTML = items.map(i=>`<div style="background:var(--bg);padding:1rem;border-radius:10px;margin-bottom:1rem;border-left:4px solid var(--primary)"><h3 style="margin:0 0 0.5rem;font-size:1rem">${i.l}</h3><div class="detail-grid"><div class="detail-item"><div class="detail-label">Kilométrage</div><div class="detail-value">${fmt(m[i.k].km)} km</div></div><div class="detail-item"><div class="detail-label">Date</div><div class="detail-value">${fmt(m[i.k].date)}</div></div><div class="detail-item" style="grid-column:1/-1"><div class="detail-label">Notes</div><div class="detail-value">${fmt(m[i.k].notes)}</div></div></div></div>`).join('');
-    document.getElementById('maintenanceFooter').innerHTML = `<button class="btn btn-close" onclick="closeModal('maintenanceModal')">Fermer</button>`;
+    document.getElementById('maintenanceFooter').innerHTML = `<button class="btn btn-close" onclick="closeModal('maintenanceModal')" title="Fermer">Fermer</button>`;
   } else {
     document.getElementById('maintenanceBody').innerHTML = items.map(i=>`<div style="background:var(--bg);padding:1rem;border-radius:10px;margin-bottom:1rem;border-left:4px solid var(--primary)"><h3 style="margin:0 0 0.5rem;font-size:1rem">${i.l}</h3><div class="form-grid"><div class="form-group"><label class="form-label">Kilométrage</label><input type="number" id="m_${i.k}_km" value="${m[i.k].km}"></div><div class="form-group"><label class="form-label">Date</label><input type="date" id="m_${i.k}_date" value="${m[i.k].date}"></div><div class="form-group" style="grid-column:1/-1"><label class="form-label">Notes</label><input id="m_${i.k}_notes" value="${m[i.k].notes}"></div></div></div>`).join('');
-    document.getElementById('maintenanceFooter').innerHTML = `<button class="btn btn-validate" onclick="saveMaintenance()">💾 Enregistrer</button><button class="btn btn-cancel" onclick="closeModal('maintenanceModal')">Fermer</button>`;
+    document.getElementById('maintenanceFooter').innerHTML = `<button class="btn btn-validate" onclick="saveMaintenance()" title="Enregistrer">💾 Enregistrer</button><button class="btn btn-cancel" onclick="closeModal('maintenanceModal')" title="Fermer">Fermer</button>`;
   }
   showModal('maintenanceModal');
 }
