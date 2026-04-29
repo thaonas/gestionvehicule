@@ -50,7 +50,10 @@ const db = {
   async save(data) { if (isElectron) return await window.electronAPI.saveDb(data); localStorage.setItem(DB_KEY, JSON.stringify(data)); return true; }
 };
 
-const defaultTires = { front: {brand:'',size:'',pressure:'',date:''}, rear: {brand:'',size:'',pressure:'',date:''}, lastCheck: '' };
+const defaultTires = { 
+  front: {brand:'',size:'',pressure:'',date:''}, 
+  rear: {brand:'',size:'',pressure:'',date:''}, 
+  lastCheck: '' };
 const defaultFluids = {
   engine: { brand: '', capacity: '', mileage: '', notes: '' },
   transmission: { brand: '', capacity: '', mileage: '', notes: '' },
@@ -58,7 +61,13 @@ const defaultFluids = {
   brake: { brand: '', notes: '' },
   washer: { brand: '', notes: '' }
 };
-const defaultMaintenance = { timingBelt: { km: '', date: '', notes: '' }, oilChange: { km: '', date: '', notes: '' }, brakeFluid: { km: '', date: '', notes: '' }, tiresRotation: { km: '', date: '', notes: '' }, generalCheck: { km: '', date: '', notes: '' } };
+const defaultMaintenance = { 
+  timingBelt: { km: '', date: '', notes: '' }, 
+  oilChange: { km: '', date: '', notes: '' }, 
+  brakeFluid: { km: '', date: '', notes: '' }, 
+  tiresRotation: { km: '', date: '', notes: '' }, 
+  generalCheck: { km: '', date: '', notes: '' } 
+};
 
 // === INIT ===
 document.addEventListener('DOMContentLoaded', async () => {
@@ -148,17 +157,32 @@ function renderMainModal(d) {
     </div>`;
   } else {
     title.textContent = currentMode==='add' ? '➕ Nouveau véhicule' : '✏️ Modifier le véhicule';
+	
+    const currentYear = new Date().getFullYear();
+    let yearOptions = '<option value=""> </option>';
+    for (let y = currentYear; y >= 1950; y--) {
+      yearOptions += `<option value="${y}" ${d.year == y ? 'selected' : ''}>${y}</option>`;
+    }
+	
     let opts = BRANDS.map(b => `<option value="${b.name}" ${d.brand===b.name?'selected':''}>${b.name}</option>`).join('');
     body.innerHTML = `<div class="form-grid">
       <div class="form-group"><label class="form-label">Propriétaire <span class="required">*</span></label><input id="m_owner" value="${d.owner}" required></div>
       <div class="form-group"><label class="form-label">Marque <span class="required">*</span></label><select id="m_brand" required>${opts}</select></div>
       <div class="form-group"><label class="form-label">Modèle <span class="required">*</span></label><input id="m_model" value="${d.model}" required></div>
-      <div class="form-group"><label class="form-label">Année</label><input type="number" id="m_year" value="${d.year||''}"></div>
+      <div class="form-group"><label class="form-label">Année</label><select id="m_year">${yearOptions}</select></div>
       <div class="form-group"><label class="form-label">Kilométrage</label><input type="number" id="m_km" value="${d.km||''}" placeholder="ex: 125000"></div>
-      <div class="form-group"><label class="form-label">Immatriculation</label><input id="m_immat" value="${d.immat||''}"></div>
+      <div class="form-group"><label class="form-label">Immatriculation</label><input id="m_immat" value="${d.immat||''}" placeholder="ex: 'AB-123-CD' ou '123-AB-45'"></div>
       <div class="form-group"><label class="form-label">VIN</label><input id="m_vin" value="${d.vin||''}" style="text-transform:uppercase"></div>
       <div class="form-group"><label class="form-label">Moteur</label><input id="m_engine" value="${d.engine||''}"></div>
-      <div class="form-group"><label class="form-label">Énergie <span class="required">*</span></label><select id="m_energy"><option value="Essence" ${d.energy==='Essence'?'selected':''}>Essence</option><option value="Diesel" ${d.energy==='Diesel'?'selected':''}>Diesel</option><option value="Hybride" ${d.energy==='Hybride'?'selected':''}>Hybride</option><option value="Électrique" ${d.energy==='Électrique'?'selected':''}>Électrique</option><option value="GPL" ${d.energy==='GPL'?'selected':''}>GPL</option></select></div>
+      <div class="form-group"><label class="form-label">Énergie <span class="required">*</span></label>
+		<select id="m_energy">
+			<option value="Essence" ${d.energy==='Essence'?'selected':''}>Essence</option>
+			<option value="Diesel" ${d.energy==='Diesel'?'selected':''}>Diesel</option>
+			<option value="Hybride" ${d.energy==='Hybride'?'selected':''}>Hybride</option>
+			<option value="Électrique" ${d.energy==='Électrique'?'selected':''}>Électrique</option>
+			<option value="GPL" ${d.energy==='GPL'?'selected':''}>GPL</option>
+		</select>
+	  </div>
     </div>
     <div class="btn-sub-group">
       <button class="btn btn-sub" onclick="openTireModal()" title="Pneumatiques">🛞 Pneumatiques</button>
@@ -172,14 +196,12 @@ function updateMainButtons() {
   const footer = document.getElementById('mainFooter');
   
   if (currentMode === 'view') {
-    // Mode lecture : Modifier + Fermer + SUPPRIMER
     footer.innerHTML = `
       <button class="btn btn-edit" onclick="enableEditMode()" title="Modifier">✏️ Modifier</button>
       <button class="btn btn-cancel" onclick="deleteVehicle()" style="background:var(--danger);color:white" title="Supprimer">🗑️ Supprimer</button>
       <button class="btn btn-close" onclick="closeModal('mainModal')" title="Fermer">Fermer</button>
     `;
   } else {
-    // Mode ajout/modif : Valider + Retour
     footer.innerHTML = `
       <button class="btn btn-validate" onclick="validateMainForm()" title="Valider">✅ Valider</button>
       <button class="btn btn-cancel" onclick="closeModal('mainModal')" title="Retour">Retour</button>
