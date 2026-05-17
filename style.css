@@ -40,15 +40,34 @@ h1 { text-align: center; margin-bottom: 2rem; font-weight: 700; }
 
 .header-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-.header-actions .btn, .header-actions .btn-add { flex: 0 0 auto; height: 38px; padding: 0 0.9rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; min-width: 0; font-size: 0.9rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-.header-actions .btn-sub { background: var(--info); }
-.header-actions .btn-edit { background: var(--warning); }
-.header-actions .btn-add  { background: var(--success); }
-.header-actions .btn, .header-actions .btn-add { color: #000000; }
-[data-theme="dark"] .header-actions .btn, [data-theme="dark"] .header-actions .btn-add { color: #ffffff; }
+
+/* === BOUTONS EN-TÊTE UNIFORMISÉS === */
+.header-actions .btn, .header-actions .btn-add {
+  flex: 0 0 auto;
+  height: 38px; min-width: 38px; /* Taille fixe, s'adapte si tu gardes du texte ailleurs */
+  padding: 0; /* Centre parfaitement les icônes */
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; /* Plus de couleur permanente */
+  border: 1px solid transparent;
+  border-radius: 8px; cursor: pointer; transition: 0.2s;
+  font-size: 1.5rem; /* Icônes agrandies */
+  color: var(--text);
+}
+
+/* Effet de survol discret pour remplacer les anciens fonds colorés */
+.header-actions .btn:hover, .header-actions .btn-add:hover {
+  background: var(--card);
+  border-color: var(--border);
+  transform: translateY(-1px);
+}
+
+/* Force la transparence sur les anciennes classes */
+.header-actions .btn-sub, .header-actions .btn-edit { background: transparent !important; }
+
+[data-theme="dark"] .header-actions .btn, [data-theme="dark"] .header-actions .btn-add { color: var(--text); }
 .header-actions .btn:hover, .header-actions .btn-add:hover { filter: brightness(0.9); transform: translateY(-1px); }
-#lockBtn.locked { background: var(--danger) !important; color:#fff !important; }
-#lockBtn.unlocked { background: var(--success) !important; color:#fff !important; }
+#lockBtn.locked { background: transparent !important; color:#fff !important; }
+#lockBtn.unlocked { background: transparent !important; color:#fff !important; }
 
 .search-bar { display: flex; gap: 0.5rem; margin: 1rem 0; align-items: center; flex-wrap: nowrap; }
 .search-bar input { flex: 1; min-width: 120px; padding: 0 0.8rem; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: 0.95rem; height: 38px; }
@@ -148,3 +167,23 @@ input:focus, select:focus { outline: none; border-color: var(--primary); box-sha
 .modal-footer .btn-cancel.danger:hover { 
   filter: brightness(0.9) !important; 
 }
+
+.modal-export .modal-content { 
+  max-width: 420px; 
+}
+
+/* === MENU DE TRI === */
+.sort-container { position: relative; display: inline-flex; }
+.sort-dropdown {
+  position: absolute; top: 115%; left: 50%; transform: translateX(-50%);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; box-shadow: var(--shadow); min-width: 170px;
+  padding: 0.3rem 0; z-index: 1050; overflow: hidden;
+}
+.sort-item {
+  width: 100%; padding: 0.6rem 1rem; text-align: left; background: transparent;
+  border: none; cursor: pointer; font-size: 0.9rem; color: var(--text);
+  transition: 0.2s; display: block;
+}
+.sort-item:hover { background: var(--bg); }
+.sort-item.active { background: var(--primary); color: #fff; }

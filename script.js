@@ -5,6 +5,7 @@ let currentMode = 'view';
 let tempTires = null, tempFluids = null, tempMaintenance = null;
 let searchFilter = { field: 'owner', text: '' };
 let pwdMode = 'create';
+let sortConfig = { field: null, direction: 'asc' };
 
 const DB_KEY = 'vehicules_db';
 const PWD_KEY = 'db_password_hash';
@@ -115,19 +116,78 @@ function matchesSearch(v) {
   switch(f) { case 'owner': val=v.owner.toLowerCase(); break; case 'brand': val=v.brand.toLowerCase(); break; case 'model': val=v.model.toLowerCase(); break; case 'engine': val=(v.engine||'').toLowerCase(); break; case 'year': val=String(v.year||''); break; default: return true; }
   return val.includes(t);
 }
+
 function renderList() {
-  const ul = document.getElementById('ownerList'), empty = document.getElementById('emptyMsg'), count = document.getElementById('countDisplay');
+  const ul = document.getElementById('ownerList');
+  const empty = document.getElementById('emptyMsg');
+  const count = document.getElementById('countDisplay');
+  
   ul.innerHTML = '';
-  const filtered = vehicles.filter(matchesSearch);
+  // On garde l'index original pour ne pas casser les clics
+  let filtered = vehicles.map((v, i) => ({...v, _idx: i})).filter(matchesSearch);
+  
+  // Application du tri
+  if (sortConfig.field) {
+    filtered.sort((a, b) => {
+      let valA = a[sortConfig.field];
+      let valB = b[sortConfig.field];
+      
+      if (['year', 'km'].includes(sortConfig.field)) {
+        valA = Number(valA) || 0; valB = Number(valB) || 0;
+        return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
+      }
+      valA = String(valA || '').toLowerCase();
+      valB = String(valB || '').toLowerCase();
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  
   count.textContent = `(${filtered.length})`;
   empty.style.display = filtered.length === 0 ? 'block' : 'none';
   empty.textContent = vehicles.length === 0 ? 'Aucun véhicule enregistré.' : 'Aucun résultat trouvé.';
-  filtered.forEach((v, i) => {
-    const li = document.createElement('li'); li.className = 'owner-item';
+  
+  filtered.forEach(v => {
+    const li = document.createElement('li');
+    li.className = 'owner-item';
     li.innerHTML = `<span style="font-weight:500">${v.owner}</span><span style="opacity:0.85;font-size:0.9em">${v.brand} ${v.model} (${v.year||'N/A'})</span>`;
-    li.onclick = () => showDetails(vehicles.indexOf(v)); ul.appendChild(li);
+    li.onclick = () => showDetails(v._idx);
+    ul.appendChild(li);
   });
 }
+
+function toggleSortDropdown() {
+  const dd = document.getElementById('sortDropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+function applySort(field) {
+  // Si on reclique sur le même critère, on inverse l'ordre
+  if (sortConfig.field === field) {
+    sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortConfig.field = field;
+    sortConfig.direction = 'asc';
+  }
+  
+  // Mise à jour visuelle du bouton
+  const arrows = { asc: '↑', desc: '↓' };
+  document.getElementById('sortBtn').textContent = arrows[sortConfig.direction];
+  
+  // Fermeture du menu & rafraîchissement
+  document.getElementById('sortDropdown').style.display = 'none';
+  renderList();
+}
+
+// Fermer le menu si on clique ailleurs
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('sortDropdown');
+  const btn = document.getElementById('sortBtn');
+  if (dd && dd.style.display === 'block' && !btn.contains(e.target) && !dd.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
 
 // === MODALS & VEHICLE CRUD ===
 function openAddModal() { currentMode='add'; currentIndex=null; tempTires=JSON.parse(JSON.stringify(defaultTires)); tempFluids=JSON.parse(JSON.stringify(defaultFluids)); tempMaintenance=JSON.parse(JSON.stringify(defaultMaintenance)); renderMainModal({owner:'',brand:'',model:'',year:'',engine:'',energy:'Essence',immat:'',vin:'',km:''}); updateMainButtons(); showModal('mainModal'); }
@@ -204,7 +264,7 @@ function updateMainButtons() {
   } else {
     footer.innerHTML = `
       <button class="btn btn-validate" onclick="validateMainForm()" title="Valider">✅ Valider</button>
-      <button class="btn btn-cancel" onclick="closeModal('mainModal')" title="Retour">Retour</button>
+      <button class="btn btn-cancel" onclick="closeModal('mainModal')" title="Annuler">Annuler</button>
     `;
   }
 }
@@ -383,24 +443,96 @@ if (!searchBarVisible) {
   document.getElementById('searchToggle').classList.remove('active');
 }
 
-// === IMPORT/EXPORT & UTILS ===
-function exportDB() { const blob = new Blob([JSON.stringify(vehicles, null, 2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `vehicules_backup_${new Date().toISOString().split('T')[0]}.json`; a.click(); }
+// === UTILITAIRES CSV ===
+function flattenObj(obj, prefix = '', sep = '__') {
+  let res = {};
+  for (let k in obj) {
+    const newKey = prefix ? `${prefix}${sep}${k}` : k;
+    if (obj[k] && typeof obj[k] === 'object' && !Array.isArray(obj[k])) Object.assign(res, flattenObj(obj[k], newKey, sep));
+    else res[newKey] = obj[k] === null || obj[k] === undefined ? '' : obj[k];
+  }
+  return res;
+}
+function unflattenObj(obj, sep = '__') {
+  let res = {};
+  for (let k in obj) {
+    const parts = k.split(sep); let target = res;
+    for (let i = 0; i < parts.length - 1; i++) { if (!target[parts[i]]) target[parts[i]] = {}; target = target[parts[i]]; }
+    target[parts[parts.length - 1]] = obj[k] === '' ? null : obj[k];
+  }
+  return res;
+}
+function toCSV(arr) {
+  if (!arr.length) return '';
+  const flat = arr.map(flattenObj);
+  const headers = Object.keys(flat[0]);
+  const esc = v => /[,"\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
+  return '\uFEFF' + [headers.join(','), ...flat.map(r => headers.map(h => esc(r[h])).join(','))].join('\n');
+}
+function fromCSV(csv) {
+  const lines = csv.replace(/^\uFEFF/, '').split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const parse = line => { let res=[], cur='', q=false; for(let i=0;i<line.length;i++){const c=line[i]; if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===','&&!q){res.push(cur.trim());cur=''}else cur+=c} res.push(cur.trim()); return res; };
+  const h = parse(lines[0]);
+  return lines.slice(1).map(l => { const v=parse(l); const o={}; h.forEach((x,i)=>o[x]=v[i]||''); return unflattenObj(o); });
+}
+
+// === EXPORT / IMPORT MULTI-FORMAT ===
+function exportDB(format = 'json') {
+  const date = new Date().toISOString().split('T')[0];
+  let blob, filename;
+  if (format === 'csv') {
+    blob = new Blob([toCSV(vehicles)], { type: 'text/csv;charset=utf-8;' });
+    filename = `vehicules_${date}.csv`;
+  } else {
+    blob = new Blob([JSON.stringify(vehicles, null, 2)], { type: 'application/json' });
+    filename = `vehicules_${date}.json`;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 function importDB(input) {
   const file = input.files[0]; if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
   const reader = new FileReader();
   reader.onload = async (e) => {
     try {
-      const imp = JSON.parse(e.target.result);
-      if (!Array.isArray(imp)) throw new Error('Format invalide');
+      let imp = [];
+      if (ext === 'json') { imp = JSON.parse(e.target.result); if (!Array.isArray(imp)) throw new Error('JSON invalide'); }
+      else if (ext === 'csv') { imp = fromCSV(e.target.result); }
+      else { throw new Error('Format non supporté'); }
+      
       if (window.confirm(`📥 Importer ${imp.length} véhicule(s) ?\n⚠️ Cela remplacera la base actuelle.`)) {
-        vehicles = imp.map(v=>({tires:{...JSON.parse(JSON.stringify(defaultTires)),...v.tires}, fluids:{...JSON.parse(JSON.stringify(defaultFluids)),...v.fluids}, maintenance:{...JSON.parse(JSON.stringify(defaultMaintenance)),...v.maintenance},...v}));
+        vehicles = imp.map(v => ({
+          tires: { ...JSON.parse(JSON.stringify(defaultTires)), ...v.tires },
+          fluids: { ...JSON.parse(JSON.stringify(defaultFluids)), ...v.fluids },
+          maintenance: { ...JSON.parse(JSON.stringify(defaultMaintenance)), ...v.maintenance },
+          ...v
+        }));
         await db.save(vehicles); renderList(); alert('✅ Import réussi !');
       }
-    } catch(err) { alert('❌ Erreur d\'import : '+err.message); }
-    input.value='';
+    } catch (err) { alert('❌ Erreur d\'import : ' + err.message); }
+    input.value = '';
   };
   reader.readAsText(file);
 }
+
+function openExportModal() {
+  const m = document.getElementById('exportModal');
+  m.style.display = 'flex';
+  setTimeout(() => m.classList.add('show'), 10);
+}
+
+function triggerExport() {
+  const format = document.getElementById('exportFormat').value;
+  exportDB(format);
+  closeModal('exportModal');
+}
+
 function openAboutModal() { const m = document.getElementById('aboutModal'); m.style.display='flex'; setTimeout(()=>m.classList.add('show'),10); }
 function get(id) { return document.getElementById(id)?.value.trim() || ''; }
 function showModal(id) { const m=document.getElementById(id); m.style.display='flex'; setTimeout(()=>m.classList.add('show'),10); }

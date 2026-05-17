@@ -24,14 +24,24 @@
     <div class="header-row">
       <h2 style="margin:0">📋 Liste des véhicules <span id="countDisplay" style="font-weight:400; color:var(--muted); font-size:0.9em;">(0)</span></h2>
       <div class="header-actions">
-        <button class="btn btn-add" onclick="openAddModal()" title="Ajouter">➕ Ajouter</button>
+        <button class="btn btn-add" onclick="openAddModal()" title="Ajouter">➕</button>
 		<button id="searchToggle" class="btn btn-sub" onclick="toggleSearchBar()" title="Rechercher">🔍</button>
-        <button id="lockBtn" class="btn btn-sub" onclick="handleLockClick()" title="Sécuriser">🔓</button>
+        <div class="sort-container">
+		<button id="sortBtn" class="btn btn-sub" onclick="toggleSortDropdown()" title="Trier">↕️</button>
+		<div id="sortDropdown" class="sort-dropdown" style="display:none;">
+		<button class="sort-item" onclick="applySort('owner')">👤 Propriétaire</button>
+		<button class="sort-item" onclick="applySort('brand')">🚗 Marque</button>
+		<button class="sort-item" onclick="applySort('model')">📦 Modèle</button>
+		<button class="sort-item" onclick="applySort('year')">📅 Année</button>
+		<button class="sort-item" onclick="applySort('km')">🛣️ Kilométrage</button>
+		</div>
+		</div>
+		<button id="lockBtn" class="btn btn-sub" onclick="handleLockClick()" title="Sécuriser">🔓</button>
         <button id="aboutBtn" class="btn btn-edit" onclick="openAboutModal()" title="À propos">ℹ️</button>
-        <button onclick="exportDB()" class="btn btn-sub" title="Exporter">📤 Exporter</button>
-        <button onclick="document.getElementById('importFile').click()" class="btn btn-edit" title="Importer">📥 Importer</button>
-        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importDB(this)">
-      </div>
+		<button onclick="openExportModal()" class="btn btn-sub" title="Exporter">📤</button>
+        <button onclick="document.getElementById('importFile').click()" class="btn btn-edit" title="Importer">📥</button>
+		<input type="file" id="importFile" accept=".json,.csv" hidden onchange="importDB(this)">      
+	  </div>
     </div>
     
     <div class="search-bar" id="searchBar">
@@ -94,7 +104,7 @@
       </div>
       <div class="modal-footer">
         <button id="pwdSubmitBtn" onclick="savePassword()" class="btn btn-validate" title="Définir">💾 Définir</button>
-        <button onclick="closeModal('passwordModal')" class="btn btn-close" title="Annuler">Annuler</button>
+        <button onclick="closeModal('passwordModal')" class="btn btn-cancel" title="Annuler">Annuler</button>
       </div>
     </div>
   </div>
@@ -114,7 +124,7 @@
           © 2026 - Tous droits réservés.
         </p>
       </div>
-      <div class="modal-footer"><button onclick="closeModal('aboutModal')" class="btn btn-close" title="Fermer">Fermer</button></div>
+      <div class="modal-footer"><button onclick="closeModal('aboutModal')" class="btn btn-cancel" title="Fermer">Fermer</button></div>
     </div>
   </div>
 
@@ -131,5 +141,31 @@
   </div>
 
   <script src="script.js"></script>
+  
+  <div id="exportModal" class="modal modal-export">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📤 Exporter la base</h2>
+      <button class="close-btn" onclick="closeModal('exportModal')" aria-label="Fermer">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 1.5rem;">
+      <div class="form-group">
+        <label class="form-label">Format du fichier</label>
+        <select id="exportFormat">
+          <option value="json">JSON (Recommandé - structure complète)</option>
+          <option value="csv">CSV / Excel (Tableau plat)</option>
+        </select>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem;">
+        💡 Le JSON conserve toutes les données imbriquées. Le CSV s'ouvre dans Excel mais aplatit la structure.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button onclick="triggerExport()" class="btn btn-validate">📥 Télécharger</button>
+      <button onclick="closeModal('exportModal')" class="btn btn-cancel">Annuler</button>
+    </div>
+  </div>
+</div>
+  
 </body>
 </html>
