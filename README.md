@@ -3,10 +3,12 @@ Version : v1.1.0
 Type : Application 100% hors ligne
 Plateformes : Web, Windows/macOS/Linux, Android
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 📖 Description
 Application conçue pour suivre et organiser l'ensemble de vos véhicules en un seul endroit. Gérez les informations générales, l'état des pneumatiques, les niveaux de liquides, et le carnet d'entretien, le tout sans connexion internet et avec une interface adaptée à tous les écrans.
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 ✨ Fonctionnalités principales
 
@@ -37,6 +39,7 @@ JSON (backup complet) ou CSV (compatible Excel/LibreOffice)
 📱 Multi-support
 Navigateur, exécutable bureau (.exe), application mobile (.apk)
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 📥 Installation & Accès
 
@@ -57,6 +60,7 @@ Sur Android : Paramètres → Sécurité → Autoriser les sources inconnues (ou
 Ouvrez le fichier .apk → Installer → Ouvrir.
 Les données restent stockées dans l'espace privé de l'application.
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 🛠️ Guide d'utilisation
 
@@ -84,6 +88,7 @@ Interrupteur en haut à droite. La préférence est mémorisée.
 🔐 Mot de passe
 🔒 → Définir ou Gérer → Laissez "Nouveau" vide pour supprimer
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 🔒 Sécurité & Données
 
@@ -105,6 +110,7 @@ Cliquez sur 📥 Importer
 Sélectionnez un fichier .json ou .csv
 Confirmez le remplacement de la base actuelle.
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 ❓ Dépannage & FAQ
 
@@ -120,6 +126,7 @@ Vérifiez que le fichier vehicules_db.json est bien présent et synchronisé, ou
 🌙 Le thème sombre ne change pas
 Forcez le rechargement avec Ctrl+F5. La préférence est stockée localement.
 
+///////////////////////////////////////////////////////////////////////////////////////////
 
 👥 Crédits & Licence
 
